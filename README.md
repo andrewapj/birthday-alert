@@ -1,11 +1,11 @@
+# Birthday Alert
 
-## Birthday Alerter
+An AWS Lambda that alerts about upcoming birthdays, deployed using the CDK
 
 ## Prerequisites
 
 - AWS Account
 - AWS CLI
-- AWS CDK
 - Node
 - Go
 
@@ -41,6 +41,11 @@ cdk bootstrap aws://{AWS_ACCOUNT}/{REGION}
 - Build the lambda
 ```
 ./build.sh
+```
+
+### Deploy the lambda
+```
+cdk deploy
 ```
 
 ## Useful CDK Commands
