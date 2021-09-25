@@ -26,7 +26,7 @@ func createLambda(construct constructs.Construct) {
 		FunctionName: jsii.String("alert"),
 		MemorySize:   jsii.Number(128),
 		Timeout:      awscdk.Duration_Seconds(jsii.Number(10)),
-		Code:         awslambda.Code_FromAsset(jsii.String("main.zip"), &awss3assets.AssetOptions{}),
+		Code:         awslambda.Code_FromAsset(jsii.String("../lambda/main.zip"), &awss3assets.AssetOptions{}),
 		Handler:      jsii.String("main"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
 	})
