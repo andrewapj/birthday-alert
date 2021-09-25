@@ -34,22 +34,32 @@ aws configure
 cdk bootstrap aws://{AWS_ACCOUNT}/{REGION}
 ```
 
+## Testing locally
+- In the 'lambda' directory
+```
+docker-compose up -d
+go test ./... -v
+docker-compose down
+```
+
 ## Deploying the lambda
 
 ### Build the lambda
+- In the 'lambda' directory
 - Ensure the build script is executable
-- Build the lambda
+
 ```
 ./build.sh
 ```
 
 ### Deploy the lambda
+- In the 'cdk' directory
 ```
 cdk deploy
 ```
 
 ## Useful CDK Commands
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
- * `go test`         run unit tests
+* `cdk deploy`      deploy this stack to your default AWS account/region
+* `cdk diff`        compare deployed stack with current state
+* `cdk synth`       emits the synthesized CloudFormation template
+* `go test`         run unit tests
