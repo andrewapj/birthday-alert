@@ -47,23 +47,25 @@ func GetKey(key string) Item {
 	})
 	if err != nil {
 		log.Println(fmt.Sprintf("Unable to get key %s from DynamoDB. Get item failed.%s", key, err))
-		return Item{
-			Date:  key,
-			Names: []string{},
-		}
+		return emptyItem(key)
 	}
 
 	if result.Item == nil {
-		return Item{
-			Date:  key,
-			Names: []string{},
-		}
+		return emptyItem(key)
 	} else {
 		item := Item{}
 		err = dynamodbattribute.UnmarshalMap(result.Item, &item)
 		if err != nil {
 			log.Println(fmt.Sprintf("Unable to unmarshal response. %s", err))
+			return emptyItem(key)
 		}
 		return item
+	}
+}
+
+func emptyItem(key string) Item {
+	return Item{
+		Date:  key,
+		Names: []string{},
 	}
 }
