@@ -20,11 +20,12 @@ cdk --version
 ### Create User and Group
 
 - Login to the AWS console as the root user and select IAM.
-- Create a group with admin permissions, or just enough permissions to perform the required actions.
+- Create a group and policy with admin permissions, or just enough permissions to perform the required actions.
 - Create a user and add it to the group.
-- Create an access key for the user.
+- Create an access key for the new user.
 
 ### Configure AWS CLI
+- Configure the CLI for the new user
 ```
 aws configure
 ```
