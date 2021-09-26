@@ -72,6 +72,13 @@ cdk deploy
 "01/09","[{""S"":""Person1, Person2""}]"
 ```
 
+## Running the lambda
+
+### Manually
+- The lambda can be run manually in the AWS Lambda console.
+- Find the function named 'alert'
+- Select the 'Test' tab and click the 'Test' button
+
 ## Useful CDK Commands
 * `cdk deploy`      deploy this stack to your default AWS account/region
 * `cdk diff`        compare deployed stack with current state
