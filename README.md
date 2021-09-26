@@ -79,6 +79,10 @@ cdk deploy
 - Find the function named 'alert'
 - Select the 'Test' tab and click the 'Test' button
 
+### Automatically
+- The lambda is set up to automatically run every day.
+  - Specified by the AWS EventBridge Rule in the CDK 
+
 ## Useful CDK Commands
 * `cdk deploy`      deploy this stack to your default AWS account/region
 * `cdk diff`        compare deployed stack with current state
