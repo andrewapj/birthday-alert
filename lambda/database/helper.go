@@ -1,7 +1,6 @@
-package test_helper
+package database
 
 import (
-	"github.com/andrewapj/birthday-alert-cdk/lambda/database"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -9,7 +8,7 @@ import (
 )
 
 //PutItem puts an item into an existing dynamoDB table for tests
-func PutItem(t *testing.T, ddb *dynamodb.DynamoDB, item database.Item) database.Item {
+func PutItem(t *testing.T, ddb *dynamodb.DynamoDB, item Item) Item {
 	data, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
 		t.Fatalf("Unable to marshal test data, %s", err)
@@ -17,7 +16,7 @@ func PutItem(t *testing.T, ddb *dynamodb.DynamoDB, item database.Item) database.
 
 	_, err = ddb.PutItem(&dynamodb.PutItemInput{
 		Item:      data,
-		TableName: aws.String(database.Table),
+		TableName: aws.String(DynamoDBTable),
 	})
 	if err != nil {
 		t.Fatalf("Unable to put test data into table. %s", err)
@@ -41,7 +40,7 @@ func BuildTable(ddb *dynamodb.DynamoDB, t *testing.T) {
 			},
 		},
 		BillingMode: aws.String(dynamodb.BillingModePayPerRequest),
-		TableName:   aws.String(database.Table),
+		TableName:   aws.String(DynamoDBTable),
 	})
 	if err != nil {
 		t.Error("Unable to create Dynamo DB table")
@@ -52,7 +51,7 @@ func BuildTable(ddb *dynamodb.DynamoDB, t *testing.T) {
 
 //DeleteTable deletes a DynamoDB table for tests
 func DeleteTable(ddb *dynamodb.DynamoDB, t *testing.T) {
-	_, err := ddb.DeleteTable(&dynamodb.DeleteTableInput{TableName: aws.String(database.Table)})
+	_, err := ddb.DeleteTable(&dynamodb.DeleteTableInput{TableName: aws.String(DynamoDBTable)})
 	if err != nil {
 		t.Error("Unable to create Dynamo DB table")
 		t.Error(err)

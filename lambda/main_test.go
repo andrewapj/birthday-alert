@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"github.com/andrewapj/birthday-alert-cdk/lambda/database"
-	"github.com/andrewapj/birthday-alert-cdk/lambda/test_helper"
 	"reflect"
 	"sort"
 	"testing"
@@ -14,8 +12,8 @@ func TestGetBirthdayMessages(t *testing.T) {
 
 	//Given: A database table
 	ddb := database.GetSession()
-	test_helper.BuildTable(ddb, t)
-	defer test_helper.DeleteTable(ddb, t)
+	database.BuildTable(ddb, t)
+	defer database.DeleteTable(ddb, t)
 
 	//And: The current time
 	theTime := time.Date(2021, 1, 1, 0, 1, 0, 0, &time.Location{})
@@ -24,7 +22,7 @@ func TestGetBirthdayMessages(t *testing.T) {
 	lookahead := "7, 14"
 
 	//And: Two birthdays in the DB
-	test_helper.PutItem(t, ddb, database.Item{
+	database.PutItem(t, ddb, database.Item{
 		Date:  "08/01",
 		Names: []string{"Bob", "Sue"},
 	})
@@ -45,9 +43,5 @@ func TestGetBirthdayMessages(t *testing.T) {
 	expected := []string{"It's Bob's birthday on 08/01", "It's Sue's birthday on 08/01"}
 	if !reflect.DeepEqual(messages, expected) {
 		t.Fatalf("Messages are not equal. Expected %v, got %v", expected, messages)
-	}
-
-	for _, message := range messages {
-		fmt.Println(message)
 	}
 }

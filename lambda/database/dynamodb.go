@@ -18,8 +18,8 @@ type Item struct {
 
 var d *dynamodb.DynamoDB
 var once sync.Once
-var Table = "Birthdays"
-var Key = "Date"
+var DynamoDBTable = "Birthdays"
+var DynamoDBKey = "Date"
 
 func GetSession() *dynamodb.DynamoDB {
 	once.Do(func() {
@@ -39,11 +39,11 @@ func GetKey(key string) Item {
 
 	result, err := ddb.GetItem(&dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
-			Key: {
+			DynamoDBKey: {
 				S: aws.String(key),
 			},
 		},
-		TableName: aws.String(Table),
+		TableName: aws.String(DynamoDBTable),
 	})
 	if err != nil {
 		log.Println(fmt.Sprintf("Unable to get key %s from DynamoDB. Get item failed.%s", key, err))

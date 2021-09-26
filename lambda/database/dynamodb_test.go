@@ -1,7 +1,6 @@
 package database
 
 import (
-	"github.com/andrewapj/birthday-alert-cdk/lambda/test_helper"
 	"reflect"
 	"sort"
 	"testing"
@@ -10,20 +9,20 @@ import (
 func TestBuildTable(t *testing.T) {
 
 	ddb := GetSession()
-	defer test_helper.DeleteTable(ddb, t)
+	defer DeleteTable(ddb, t)
 
-	test_helper.BuildTable(ddb, t)
+	BuildTable(ddb, t)
 }
 
 func TestGetKey(t *testing.T) {
 
 	// Given: a session and a DB table
 	ddb := GetSession()
-	test_helper.BuildTable(ddb, t)
-	defer test_helper.DeleteTable(ddb, t)
+	BuildTable(ddb, t)
+	defer DeleteTable(ddb, t)
 
 	// And: some test data in the DB
-	item := test_helper.PutItem(t, ddb, Item{
+	item := PutItem(t, ddb, Item{
 		Date:  "01/12",
 		Names: []string{"Person 1", "Person 2"},
 	})
@@ -45,8 +44,8 @@ func TestGetKeyWithNoData(t *testing.T) {
 
 	// Given: a session and a DB table, but no data
 	ddb := GetSession()
-	test_helper.BuildTable(ddb, t)
-	defer test_helper.DeleteTable(ddb, t)
+	BuildTable(ddb, t)
+	defer DeleteTable(ddb, t)
 
 	// When: We get the birthdays for 01/12
 	results := GetKey("01/12")
