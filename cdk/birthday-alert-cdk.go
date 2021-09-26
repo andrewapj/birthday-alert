@@ -46,6 +46,12 @@ func createLambda(construct constructs.Construct, table awsdynamodb.Table) {
 		Code:         awslambda.Code_FromAsset(jsii.String("../lambda/main.zip"), &awss3assets.AssetOptions{}),
 		Handler:      jsii.String("main"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
+		Environment: &map[string]*string{
+			"APP_AWS_ENDPOINT":        jsii.String(""),
+			"APP_AWS_REGION":          jsii.String("eu-west-1"),
+			"APP_DAYS_LOOKAHEAD":      jsii.String("7, 14"),
+			"APP_NOTIFICATION_STRING": jsii.String("It's %s's birthday on %s"),
+		},
 	}).AddToRolePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 		Actions:   &[]*string{jsii.String("*")},
 		Effect:    awsiam.Effect_ALLOW,
