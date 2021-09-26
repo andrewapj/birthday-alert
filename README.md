@@ -58,6 +58,19 @@ docker-compose down
 cdk deploy
 ```
 
+### Adding birthdays to AWS DynamoDB
+- Birthdays can be added manually via the AWS DynamoDB console
+- The hash key for the table is 'Date'.
+  - In the format "DD/MM", left padded with zeros as necessary
+- Each item contains only one other attribute called 'Names'
+  - This is a list of strings that contains the names of people who's birthdays fall on the date
+  specified by the key
+- Below is a CSV example:
+```
+"Date","Names"
+"01/09","[{""S"":""Person1, Person2""}]"
+```
+
 ## Useful CDK Commands
 * `cdk deploy`      deploy this stack to your default AWS account/region
 * `cdk diff`        compare deployed stack with current state
