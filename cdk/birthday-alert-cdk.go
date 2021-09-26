@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/aws/aws-cdk-go/awscdk"
 	"github.com/aws/aws-cdk-go/awscdk/awsdynamodb"
+	"github.com/aws/aws-cdk-go/awscdk/awsevents"
+	"github.com/aws/aws-cdk-go/awscdk/awseventstargets"
 	"github.com/aws/aws-cdk-go/awscdk/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/awslambda"
 	"github.com/aws/aws-cdk-go/awscdk/awss3assets"
@@ -18,7 +20,8 @@ func main() {
 	})
 
 	table := createDynamoDbTable(stack)
-	createLambda(stack, table)
+	lambda := createLambda(stack, table)
+	createEventRule(stack, lambda)
 
 	app.Synth(nil)
 }
@@ -37,8 +40,8 @@ func createDynamoDbTable(construct constructs.Construct) awsdynamodb.Table {
 }
 
 //Create the lambda with an extra policy attached that allows it to access the DynamoDB table.
-func createLambda(construct constructs.Construct, table awsdynamodb.Table) {
-	awslambda.NewFunction(construct, jsii.String("BirthdayAlertLambda"), &awslambda.FunctionProps{
+func createLambda(construct constructs.Construct, table awsdynamodb.Table) awslambda.Function {
+	l := awslambda.NewFunction(construct, jsii.String("BirthdayAlertLambda"), &awslambda.FunctionProps{
 		Description:  jsii.String("Lambda function to alert about upcoming birthdays"),
 		FunctionName: jsii.String("alert"),
 		MemorySize:   jsii.Number(128),
@@ -52,11 +55,31 @@ func createLambda(construct constructs.Construct, table awsdynamodb.Table) {
 			"APP_DAYS_LOOKAHEAD":      jsii.String("7, 14"),
 			"APP_NOTIFICATION_STRING": jsii.String("It's %s's birthday on %s"),
 		},
-	}).AddToRolePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+	})
+
+	l.AddToRolePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 		Actions:   &[]*string{jsii.String("*")},
 		Effect:    awsiam.Effect_ALLOW,
 		Resources: &[]*string{table.TableArn()},
 	}))
+
+	return l
+}
+
+func createEventRule(construct constructs.Construct, function awslambda.Function) {
+	awsevents.NewRule(construct, jsii.String("BirthdayAlertLambdaEvent"), &awsevents.RuleProps{
+		Description:  jsii.String("The event that triggers the Birthday Alert Lambda"),
+		Enabled:      jsii.Bool(true),
+		EventBus:     nil,
+		EventPattern: nil,
+		RuleName:     jsii.String("BirthdayAlertLambdaEvent"),
+		Schedule: awsevents.Schedule_Cron(&awsevents.CronOptions{
+			Hour:   jsii.String("12"),
+			Minute: jsii.String("0"),
+		}),
+		Targets: &[]awsevents.IRuleTarget{
+			awseventstargets.NewLambdaFunction(function, &awseventstargets.LambdaFunctionProps{})},
+	})
 }
 
 func env() *awscdk.Environment {
