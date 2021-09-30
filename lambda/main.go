@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/andrewapj/birthday-alert-cdk/lambda/config"
 	"github.com/andrewapj/birthday-alert-cdk/lambda/database"
+	"github.com/andrewapj/birthday-alert-cdk/lambda/sns"
 	"github.com/andrewapj/birthday-alert-cdk/lambda/temporal"
 	"github.com/aws/aws-lambda-go/lambda"
 	"log"
@@ -21,8 +22,12 @@ func HandleRequest() error {
 	}
 
 	if len(messages) > 0 {
-		log.Println("Generated the following birthday messages")
+		log.Println("Notifying for the following messages...")
 		log.Println(fmt.Sprintf("%v", messages))
+
+		for _, message := range messages {
+			sns.PublishMessage(message)
+		}
 	}
 
 	return nil

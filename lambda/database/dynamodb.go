@@ -23,9 +23,7 @@ var DynamoDBKey = "Date"
 
 func GetSession() *dynamodb.DynamoDB {
 	once.Do(func() {
-		s := session.Must(session.NewSessionWithOptions(session.Options{
-			SharedConfigState: session.SharedConfigEnable,
-		}))
+		s := session.Must(session.NewSessionWithOptions(session.Options{}))
 		d = dynamodb.New(s, &aws.Config{
 			Endpoint: aws.String(config.AwsEndpoint),
 			Region:   aws.String(config.AwsRegion),

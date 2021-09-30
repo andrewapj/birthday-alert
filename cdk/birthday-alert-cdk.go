@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/awslambda"
 	"github.com/aws/aws-cdk-go/awscdk/awss3assets"
+	"github.com/aws/aws-cdk-go/awscdk/awssns"
 	"github.com/aws/constructs-go/constructs/v3"
 	"github.com/aws/jsii-runtime-go"
 	"os"
@@ -20,7 +21,9 @@ func main() {
 	})
 
 	table := createDynamoDbTable(stack)
-	lambda := createLambda(stack, table)
+	topic := createSNSAndSubscription(stack)
+	lambda := createLambda(stack, table, topic)
+	addSNSPermissions(topic, lambda)
 	createEventRule(stack, lambda)
 
 	app.Synth(nil)
@@ -40,7 +43,7 @@ func createDynamoDbTable(construct constructs.Construct) awsdynamodb.Table {
 }
 
 //Create the lambda with an extra policy attached that allows it to access the DynamoDB table.
-func createLambda(construct constructs.Construct, table awsdynamodb.Table) awslambda.Function {
+func createLambda(construct constructs.Construct, table awsdynamodb.Table, topic awssns.Topic) awslambda.Function {
 	l := awslambda.NewFunction(construct, jsii.String("BirthdayAlertLambda"), &awslambda.FunctionProps{
 		Description:  jsii.String("Lambda function to alert about upcoming birthdays"),
 		FunctionName: jsii.String("alert"),
@@ -51,9 +54,10 @@ func createLambda(construct constructs.Construct, table awsdynamodb.Table) awsla
 		Runtime:      awslambda.Runtime_GO_1_X(),
 		Environment: &map[string]*string{
 			"APP_AWS_ENDPOINT":        jsii.String(""),
-			"APP_AWS_REGION":          jsii.String("eu-west-1"),
+			"APP_AWS_REGION":          env().Region,
 			"APP_DAYS_LOOKAHEAD":      jsii.String("7, 14"),
 			"APP_NOTIFICATION_STRING": jsii.String("It's %s's birthday on %s"),
+			"APP_SNS_TOPIC":           topic.TopicArn(),
 		},
 	})
 
@@ -64,6 +68,38 @@ func createLambda(construct constructs.Construct, table awsdynamodb.Table) awsla
 	}))
 
 	return l
+}
+
+func createSNSAndSubscription(construct constructs.Construct) awssns.Topic {
+	t := awssns.NewTopic(construct, jsii.String("BirthdayAlertTopic"), &awssns.TopicProps{
+		DisplayName: jsii.String("Birthday alert topic"),
+		Fifo:        jsii.Bool(false),
+		TopicName:   jsii.String("BIRTHDAY_ALERT"),
+	})
+
+	if email, exists := os.LookupEnv("CDK_EMAIL_SUBSCRIPTION"); exists == true {
+		awssns.NewSubscription(construct, jsii.String("BirthdayAlertTopicSubscription"), &awssns.SubscriptionProps{
+			Endpoint: jsii.String(email),
+			Protocol: awssns.SubscriptionProtocol_EMAIL,
+			Topic:    t,
+		})
+	}
+	return t
+}
+
+func addSNSPermissions(t awssns.Topic, function awslambda.Function) {
+	t.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+		Principals: &[]awsiam.IPrincipal{function.GrantPrincipal()},
+		Actions: &[]*string{
+			jsii.String("sns:GetTopicAttributes"),
+			jsii.String("sns:ListSubscriptionsByTopic"),
+			jsii.String("sns:Publish"),
+			jsii.String("sns:SetTopicAttributes"),
+			jsii.String("sns:Subscribe"),
+		},
+		Effect:    awsiam.Effect_ALLOW,
+		Resources: &[]*string{jsii.String("*")},
+	}))
 }
 
 func createEventRule(construct constructs.Construct, function awslambda.Function) {
