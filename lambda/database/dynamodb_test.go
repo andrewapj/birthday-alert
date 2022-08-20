@@ -1,20 +1,16 @@
 package database
 
 import (
+	"github.com/andrewapj/birthday-alert-cdk/lambda/test_config"
 	"reflect"
 	"sort"
 	"testing"
 )
 
-func TestBuildTable(t *testing.T) {
-
-	ddb := GetClient()
-	defer DeleteTable(ddb, t)
-
-	BuildTable(ddb, t)
-}
-
 func TestGetKey(t *testing.T) {
+
+	test_config.SetAWSCredentials()
+	defer test_config.UnsetAWSCredentials()
 
 	// Given: a session and a DB table
 	ddb := GetClient()
@@ -41,6 +37,9 @@ func TestGetKey(t *testing.T) {
 }
 
 func TestGetKeyWithNoData(t *testing.T) {
+
+	test_config.SetAWSCredentials()
+	defer test_config.UnsetAWSCredentials()
 
 	// Given: a session and a DB table, but no data
 	ddb := GetClient()

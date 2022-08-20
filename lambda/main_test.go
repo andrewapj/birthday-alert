@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/andrewapj/birthday-alert-cdk/lambda/database"
+	"github.com/andrewapj/birthday-alert-cdk/lambda/test_config"
 	"reflect"
 	"sort"
 	"testing"
@@ -9,6 +10,9 @@ import (
 )
 
 func TestGetBirthdayMessages(t *testing.T) {
+
+	test_config.SetAWSCredentials()
+	defer test_config.UnsetAWSCredentials()
 
 	//Given: A database table
 	ddb := database.GetClient()
