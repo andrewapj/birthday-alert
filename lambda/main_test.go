@@ -11,7 +11,7 @@ import (
 func TestGetBirthdayMessages(t *testing.T) {
 
 	//Given: A database table
-	ddb := database.GetSession()
+	ddb := database.GetClient()
 	database.BuildTable(ddb, t)
 	defer database.DeleteTable(ddb, t)
 

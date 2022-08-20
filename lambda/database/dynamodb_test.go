@@ -8,7 +8,7 @@ import (
 
 func TestBuildTable(t *testing.T) {
 
-	ddb := GetSession()
+	ddb := GetClient()
 	defer DeleteTable(ddb, t)
 
 	BuildTable(ddb, t)
@@ -17,7 +17,7 @@ func TestBuildTable(t *testing.T) {
 func TestGetKey(t *testing.T) {
 
 	// Given: a session and a DB table
-	ddb := GetSession()
+	ddb := GetClient()
 	BuildTable(ddb, t)
 	defer DeleteTable(ddb, t)
 
@@ -43,7 +43,7 @@ func TestGetKey(t *testing.T) {
 func TestGetKeyWithNoData(t *testing.T) {
 
 	// Given: a session and a DB table, but no data
-	ddb := GetSession()
+	ddb := GetClient()
 	BuildTable(ddb, t)
 	defer DeleteTable(ddb, t)
 

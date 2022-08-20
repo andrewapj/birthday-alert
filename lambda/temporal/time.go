@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//GetLookaheadDays returns an array containing all the days we will check for birthdays
+// GetLookaheadDays returns an array containing all the days we will check for birthdays
 func GetLookaheadDays(t time.Time, lookaheadDays string) []string {
 
 	lookaheadDayValues := convertLookaheadDays(lookaheadDays)
@@ -20,7 +20,7 @@ func GetLookaheadDays(t time.Time, lookaheadDays string) []string {
 	return modifiedDays
 }
 
-//convertLookaheadDays converts the lookahead days csv string into an array of integers
+// convertLookaheadDays converts the lookahead days csv string into an array of integers
 func convertLookaheadDays(lookaheadDays string) []int {
 	lookaheadStrings := strings.Split(lookaheadDays, ",")
 	if len(lookaheadStrings) == 0 {
@@ -40,7 +40,7 @@ func convertLookaheadDays(lookaheadDays string) []int {
 	return lookaheadValues
 }
 
-//getDateString Gets a date string in the format DD/MM. This is the format used as the hash key in the dynamo db table
+// getDateString Gets a date string in the format DD/MM. This is the format used as the hash key in the dynamo db table
 func getDateString(t time.Time) string {
 	day := t.Day()
 	month := t.Month()

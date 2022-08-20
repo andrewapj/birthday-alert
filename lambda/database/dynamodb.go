@@ -1,48 +1,45 @@
 package database
 
 import (
+	"context"
 	"fmt"
 	"github.com/andrewapj/birthday-alert-cdk/lambda/config"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"log"
 	"sync"
 )
-import "github.com/aws/aws-sdk-go/aws/session"
 
 type Item struct {
 	Date  string
 	Names []string
 }
 
-var d *dynamodb.DynamoDB
 var once sync.Once
+var d *dynamodb.Client
 var DynamoDBTable = "Birthdays"
 var DynamoDBKey = "Date"
 
-func GetSession() *dynamodb.DynamoDB {
+func GetClient() *dynamodb.Client {
 	once.Do(func() {
-		s := session.Must(session.NewSessionWithOptions(session.Options{}))
-		d = dynamodb.New(s, &aws.Config{
-			Endpoint: aws.String(config.AwsEndpoint),
-			Region:   aws.String(config.AwsRegion),
-		})
+		d = dynamodb.NewFromConfig(config.GetAwsConfig())
 	})
 	return d
 }
 
 func GetKey(key string) Item {
-	ddb := GetSession()
+	ddb := GetClient()
 
-	result, err := ddb.GetItem(&dynamodb.GetItemInput{
-		Key: map[string]*dynamodb.AttributeValue{
-			DynamoDBKey: {
-				S: aws.String(key),
-			},
-		},
+	getItemInput := &dynamodb.GetItemInput{
 		TableName: aws.String(DynamoDBTable),
-	})
+		Key: map[string]types.AttributeValue{
+			DynamoDBKey: &types.AttributeValueMemberS{Value: key},
+		},
+	}
+
+	result, err := ddb.GetItem(context.TODO(), getItemInput)
 	if err != nil {
 		log.Println(fmt.Sprintf("Unable to get key %s from DynamoDB. Get item failed.%s", key, err))
 		return emptyItem(key)
@@ -52,7 +49,7 @@ func GetKey(key string) Item {
 		return emptyItem(key)
 	} else {
 		item := Item{}
-		err = dynamodbattribute.UnmarshalMap(result.Item, &item)
+		err = attributevalue.UnmarshalMap(result.Item, &item)
 		if err != nil {
 			log.Println(fmt.Sprintf("Unable to unmarshal response. %s", err))
 			return emptyItem(key)

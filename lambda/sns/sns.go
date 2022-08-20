@@ -1,25 +1,25 @@
 package sns
 
 import (
+	"context"
 	"fmt"
 	"github.com/andrewapj/birthday-alert-cdk/lambda/config"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"log"
 )
 
 func PublishMessage(message string) {
 
-	s := session.Must(session.NewSessionWithOptions(session.Options{}))
-	client := sns.New(s, aws.NewConfig().WithRegion(config.AwsRegion))
+	client := sns.NewFromConfig(config.GetAwsConfig())
 
-	_, err := client.Publish(&sns.PublishInput{
+	_, err := client.Publish(context.TODO(), &sns.PublishInput{
 		Message:  aws.String(message),
-		Subject:  aws.String("New Upcoming Birthday"),
+		Subject:  aws.String(config.NotificationTitle),
 		TopicArn: aws.String(config.SnsTopic),
 	})
+
 	if err != nil {
-		log.Println(fmt.Sprintf("Error publishing message to %s. %s", config.SnsTopic, err))
+		log.Fatalf(fmt.Sprintf("Error publishing message to %s. %s", config.SnsTopic, err))
 	}
 }

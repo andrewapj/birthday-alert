@@ -49,7 +49,7 @@ func GetBirthdayMessages(t time.Time, daysLookahead string) ([]string, error) {
 		if len(item.Names) > 0 {
 			log.Println(fmt.Sprintf("Found birthdays for %v on %s", item.Names, date))
 			for _, name := range item.Names {
-				messages = append(messages, fmt.Sprintf(config.NotificationString, name, date))
+				messages = append(messages, fmt.Sprintf(config.NotificationMessage, name, date))
 			}
 		} else {
 			log.Println(fmt.Sprintf("Found no birthdays on %s", date))
