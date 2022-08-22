@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-var awsEndpoint = getEnvVariable("APP_AWS_ENDPOINT", "http://localhost:8000")
+var profile = getEnvVariable("APP_PROFILE", "local")
 var awsRegion = getEnvVariable("APP_AWS_REGION", "eu-west-2")
 var DaysLookAhead = getEnvVariable("APP_DAYS_LOOKAHEAD", "7, 14")
 var NotificationTitle = getEnvVariable("APP_NOTIFICATION_TITLE", "New Upcoming Birthday")
@@ -22,19 +22,38 @@ var config aws.Config
 
 func GetAwsConfig() aws.Config {
 	once.Do(func() {
-		endpointResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-			return aws.Endpoint{URL: awsEndpoint}, nil
-		})
 
-		cfg, err := awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(awsRegion),
-			awsconfig.WithEndpointResolverWithOptions(endpointResolver))
-		if err != nil {
-			log.Fatalln(fmt.Sprintf("unable to initialise AWS config: %s", err))
+		if profile == "local" {
+			config = getLocalConfig()
+		} else {
+			config = getAWSConfig()
 		}
-		config = cfg
 	})
 
 	return config
+}
+
+func getLocalConfig() aws.Config {
+	endpointResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+		return aws.Endpoint{URL: "http://localhost:8000"}, nil
+	})
+
+	cfg, err := awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(awsRegion),
+		awsconfig.WithEndpointResolverWithOptions(endpointResolver))
+
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("unable to initialise AWS config: %s", err))
+	}
+
+	return cfg
+}
+
+func getAWSConfig() aws.Config {
+	cfg, err := awsconfig.LoadDefaultConfig(context.TODO(), awsconfig.WithRegion(awsRegion))
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("unable to initialise AWS config: %s", err))
+	}
+	return cfg
 }
 
 func getEnvVariable(key, def string) string {

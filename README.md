@@ -26,50 +26,35 @@ The following AWS resources are used:
 ## Prerequisites
 
 - AWS Account
-- AWS CLI
+- AWS CLI (with relevant permissions to your AWS account)
 - Node
 - Go
+- Make
 
 ## Testing locally
-- In the 'lambda' directory
-```
-docker-compose up -d
-go test ./... -v
-docker-compose down
-```
+In the 'lambda' directory
+
+```make test```
 
 ## Deploying to AWS
 
 ### Install CDK
+- This will only need to be done once
 ```
 npm install -g aws-cdk
 cdk --version
 ```
 
-### Create User and Group
-
-- Login to the AWS console as the root user and select IAM.
-- Create a group and policy with admin permissions, or just enough permissions to perform the required actions.
-- Create a user and add it to the group.
-- Create an access key for the new user.
-
-### Configure AWS CLI
-- Configure the CLI for the new user
-```
-aws configure
-```
-
 ### Bootstrap the CDK
+- This will only need to be done once
 ```
 cdk bootstrap aws://{AWS_ACCOUNT}/{REGION}
 ```
 
 ### Building the lambda
-- In the 'lambda' directory
-- Ensure the build script is executable
-```
-./build.sh
-```
+In the 'lambda' directory
+
+```make build```
 
 ### Running the CDK
 - Set the required environment variables:
