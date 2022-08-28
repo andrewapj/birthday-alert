@@ -10,12 +10,12 @@ import (
 
 // CreateEventRule creates an event bridge rule
 func CreateEventRule(construct constructs.Construct, function awslambda.Function) {
-	awsevents.NewRule(construct, jsii.String("BirthdayAlertLambdaEvent"), &awsevents.RuleProps{
+	awsevents.NewRule(construct, jsii.String("BirthdayAlertEvent"), &awsevents.RuleProps{
 		Description:  jsii.String("The event that triggers the Birthday Alert Lambda"),
 		Enabled:      jsii.Bool(true),
 		EventBus:     nil,
 		EventPattern: nil,
-		RuleName:     jsii.String("BirthdayAlertLambdaEvent"),
+		RuleName:     jsii.String("BirthdayAlertEvent"),
 		Schedule: awsevents.Schedule_Cron(&awsevents.CronOptions{
 			Hour:   jsii.String("12"),
 			Minute: jsii.String("0"),
