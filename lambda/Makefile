@@ -1,8 +1,8 @@
 .PHONY: build
 
 build:
-	GOOS=linux GOARCH=amd64 go build -o main main.go
-	zip main.zip main
+	GOARCH=amd64 GOOS=linux go build -tags lambda.norpc -o bootstrap main.go
+	zip bootstrap.zip bootstrap
 
 test:
 	docker-compose up -d
